@@ -1,0 +1,73 @@
+{
+  "name": "voiceout",
+  "version": "1.0.0",
+  "description": "This is the API and backend server for my final year project mobile and web application - VoiceOut.",
+  "main": "./dist/server.js",
+  "scripts": {
+    "start": "node -r ./tsconfig-paths-bootstrap.js ./dist/server",
+    "dev": "nodemon ./src/server.ts",
+    "dev-prod": "set NODE_ENV=production&& nodemon ./src/server.ts",
+    "build": "tsc -p .",
+    "test": "jest --detectOpenHandles",
+    "start:prod": "pm2 start --env production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/khomohzie/voiceout-api.git"
+  },
+  "keywords": [
+    "mobile",
+    "express",
+    "typescript",
+    "api",
+    "server",
+    "backend"
+  ],
+  "author": "Daniel Komolafe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/khomohzie/voiceout-api/issues"
+  },
+  "homepage": "https://github.com/khomohzie/voiceout-api#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "chalk": "4.1.2",
+    "cloudinary": "^1.35.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-formidable-typescript": "^1.0.2",
+    "helmet": "^6.0.1",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.0",
+    "jwt-promisify": "^1.1.7",
+    "moment": "^2.29.4",
+    "mongoose": "^7.0.1",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.1",
+    "rand-token": "^1.0.1",
+    "redis": "^4.6.5",
+    "scrawny": "^1.0.0",
+    "toobusy-js": "^0.5.1",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/formidable": "^2.0.5",
+    "@types/hpp": "^0.2.2",
+    "@types/jsonwebtoken": "^9.0.1",
+    "@types/mongoose": "^5.11.97",
+    "@types/morgan": "^1.9.4",
+    "@types/node": "^18.15.0",
+    "@types/nodemailer": "^6.4.7",
+    "@types/toobusy-js": "^0.5.2",
+    "nodemon": "^2.0.21",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.2",
+    "typescript": "^4.9.5"
+  }
+}
