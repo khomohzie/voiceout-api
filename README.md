@@ -1,5 +1,5 @@
-# shelter-api
-This is the API and backend server for the Shelter mobile application.
+# voiceout-api
+This is the API and backend server for my final year project mobile and web application - VoiceOut.
 
 ### Error codes
 1.
