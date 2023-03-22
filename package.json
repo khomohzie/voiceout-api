@@ -2,17 +2,18 @@
   "name": "voiceout",
   "version": "1.0.0",
   "description": "This is the API and backend server for my final year project mobile and web application - VoiceOut.",
-  "main": "./dist/server.js",
+  "main": "server.js",
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "start": "node -r ./tsconfig-paths-bootstrap.js ./dist/server",
+    "start": "node -r ./tsconfig-paths-bootstrap.js dist/server.js",
     "dev": "nodemon ./src/server.ts",
     "dev-prod": "set NODE_ENV=production&& nodemon ./src/server.ts",
     "build": "tsc -p .",
     "test": "jest --detectOpenHandles",
-    "start:prod": "pm2 start --env production"
+    "start:prod": "pm2 start --env production",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
