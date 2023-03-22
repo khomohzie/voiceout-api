@@ -5,6 +5,7 @@ dist
 coverage
 # __tests__
 coverage
+uploads
 yarn-error.log
 logs
 **.log
