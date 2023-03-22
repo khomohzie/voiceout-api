@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "This is the API and backend server for my final year project mobile and web application - VoiceOut.",
   "main": "./dist/server.js",
+  "engines": {
+    "node": ">=14"
+  },
   "scripts": {
     "start": "node -r ./tsconfig-paths-bootstrap.js ./dist/server",
     "dev": "nodemon ./src/server.ts",
