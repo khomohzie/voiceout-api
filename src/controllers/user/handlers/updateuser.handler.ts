@@ -15,116 +15,114 @@ import * as formidable from "formidable";
  */
 
 const updateProfile = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-	try {
-		const body = req.fields?.data as string;
+  try {
+    const body = req.fields?.data as string;
 
-		let data: IUser;
+    let data: IUser;
 
-		if (body) {
-			data = JSON.parse(body);
-		} else {
-			data = {} as IUser;
-		}
+    if (body) {
+      data = JSON.parse(body);
+    } else {
+      data = {} as IUser;
+    }
 
-		const avatarImage = req.files?.avatarImage as formidable.File;
-		const coverImage = req.files?.coverImage as formidable.File;
+    const avatarImage = req.files?.avatarImage as formidable.File;
+    const coverImage = req.files?.coverImage as formidable.File;
 
-		//* If this controller is called for profile setup, then these are required.
-		if (req.query.action === "setup") {
-			const validate = match.obj(data, [
-				"firstname",
-				"lastname",
-				"matric",
-			]);
+    //* If this controller is called for profile setup, then these are required.
+    if (req.query.action === "setup") {
+      let validate: boolean | string[];
 
-			if (validate !== true) {
-				return next(
-					new CustomException(
-						400,
-						"One or more required fields are missing.",
-						validate
-					)
-				);
-			}
+      if (req.query.role === "student") {
+        validate = match.obj(data, ["firstname", "lastname", "matric"]);
+      } else {
+        validate = match.obj(data, ["firstname", "lastname", "office"]);
+      }
 
-			if (await User.findOne({ matric: data.matric }).exec()) {
-				return next(
-					new CustomException(
-						400,
-						"Matric number has already been used."
-					)
-				);
-			}
+      if (validate !== true) {
+        return next(
+          new CustomException(
+            400,
+            "One or more required fields are missing.",
+            validate
+          )
+        );
+      }
 
-			//* active is false until user sets up profile. It will also help in routing
-			//* on the frontend - either to profile_setup screen or home screen.
-			data.active = true;
-		}
+      if (await User.findOne({ matric: data.matric }).exec()) {
+        return next(
+          new CustomException(400, "Matric number has already been used.")
+        );
+      }
 
-		const user = await User.findOne({ _id: req.user._id }).exec();
+      //* active is false until user sets up profile. It will also help in routing
+      //* on the frontend - either to profile_setup screen or home screen.
+      data.active = true;
+    }
 
-		if (!user)
-			return next(
-				new CustomException(400, "No user found!", {
-					reason: "account not found",
-					alias: "acc_not_found",
-					code: "ACC_ERR_01",
-				})
-			);
+    const user = await User.findOne({ _id: req.user._id }).exec();
 
-		// Upload image to cloudinary
-		const cloudinaryFolder = `${user.email}-${user._id}`;
+    if (!user)
+      return next(
+        new CustomException(400, "No user found!", {
+          reason: "account not found",
+          alias: "acc_not_found",
+          code: "ACC_ERR_01",
+        })
+      );
 
-		if (avatarImage) {
-			await cloudinaryUpload(avatarImage.filepath, cloudinaryFolder)
-				.then((downloadURL) => {
-					data.avatar = downloadURL;
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-		}
+    // Upload image to cloudinary
+    const cloudinaryFolder = `${user.email}-${user._id}`;
 
-		if (coverImage) {
-			await cloudinaryUpload(coverImage.filepath, cloudinaryFolder)
-				.then((downloadURL) => {
-					data.cover_photo = downloadURL;
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-		}
+    if (avatarImage) {
+      await cloudinaryUpload(avatarImage.filepath, cloudinaryFolder)
+        .then((downloadURL) => {
+          data.avatar = downloadURL;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
 
-		// If someone entered a new password/pin illegally, revert to old password/pin
-		data.password = user.password;
-		data.reset_password_pin = user.reset_password_pin;
-		data.email = user.email;
-		if (user.matric && user.matric?.length > 0) data.matric = user.matric;
-		if (data && data.role) {
-			data.role.type = user.role.type;
-			data.role.id = user.role.id;
-		}
+    if (coverImage) {
+      await cloudinaryUpload(coverImage.filepath, cloudinaryFolder)
+        .then((downloadURL) => {
+          data.cover_photo = downloadURL;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
 
-		// Capitalize firstname and lastname
-		if (data && data.firstname)
-			data.firstname = filter.str(data.firstname, "F");
-		if (data && data.lastname)
-			data.lastname = filter.str(data.lastname, "F");
+    // If someone entered a new password/pin illegally, revert to old password/pin
+    data.password = user.password;
+    data.reset_password_pin = user.reset_password_pin;
+    data.email = user.email;
+    if (user.matric && user.matric?.length > 0) data.matric = user.matric;
+    if (data && data.role) {
+      data.role.type = user.role.type;
+      data.role.id = user.role.id;
+    }
 
-		await User.updateOne({ _id: req.user._id }, { $set: data }).exec();
+    // Capitalize firstname and lastname
+    if (data && data.firstname)
+      data.firstname = filter.str(data.firstname, "F");
+    if (data && data.lastname) data.lastname = filter.str(data.lastname, "F");
 
-		return new CustomResponse(res).success("Profile updated.", {}, 200, {
-			status: "Success",
-			path: "profile setup",
-		});
-	} catch (error) {
-		console.log(error);
-		return next(error);
-	}
+    await User.updateOne({ _id: req.user._id }, { $set: data }).exec();
+
+    return new CustomResponse(res).success("Profile updated.", {}, 200, {
+      status: "Success",
+      path: "profile setup",
+    });
+  } catch (error) {
+    console.log(error);
+    return next(error);
+  }
 };
 
 /**
@@ -134,58 +132,51 @@ const updateProfile = async (
  */
 
 const changeAvatar = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-	try {
-		const avatarImage = req.files?.avatarImage as formidable.File;
+  try {
+    const avatarImage = req.files?.avatarImage as formidable.File;
 
-		const user = await User.findOne({ _id: req.user._id }).exec();
+    const user = await User.findOne({ _id: req.user._id }).exec();
 
-		if (!user)
-			return next(
-				new CustomException(400, "No user found!", {
-					reason: "account not found",
-					alias: "acc_not_found",
-					code: "ACC_ERR_01",
-				})
-			);
+    if (!user)
+      return next(
+        new CustomException(400, "No user found!", {
+          reason: "account not found",
+          alias: "acc_not_found",
+          code: "ACC_ERR_01",
+        })
+      );
 
-		// Upload image to cloudinary
-		const cloudinaryFolder = `${user.email}-${user._id}`;
+    // Upload image to cloudinary
+    const cloudinaryFolder = `${user.email}-${user._id}`;
 
-		if (avatarImage) {
-			await cloudinaryUpload(avatarImage.filepath, cloudinaryFolder)
-				.then(async (downloadURL) => {
-					await User.updateOne(
-						{ _id: req.user._id },
-						{ $set: { avatar: downloadURL } }
-					).exec();
+    if (avatarImage) {
+      await cloudinaryUpload(avatarImage.filepath, cloudinaryFolder)
+        .then(async (downloadURL) => {
+          await User.updateOne(
+            { _id: req.user._id },
+            { $set: { avatar: downloadURL } }
+          ).exec();
 
-					return new CustomResponse(res).success(
-						"Avatar updated.",
-						{},
-						200,
-						{
-							status: "Success",
-							path: "change avatar",
-						}
-					);
-				})
-				.catch((error) => {
-					console.error(error);
-					return next(
-						new CustomException(error.status || 400, error)
-					);
-				});
-		} else {
-			return next(new CustomException(400, "No data/image sent."));
-		}
-	} catch (error) {
-		console.log(error);
-		return next(error);
-	}
+          return new CustomResponse(res).success("Avatar updated.", {}, 200, {
+            status: "Success",
+            path: "change avatar",
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+          return next(new CustomException(error.status || 400, error));
+        });
+    } else {
+      return next(new CustomException(400, "No data/image sent."));
+    }
+  } catch (error) {
+    console.log(error);
+    return next(error);
+  }
 };
 
 /**
@@ -195,58 +186,56 @@ const changeAvatar = async (
  */
 
 const changeCoverImage = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-	try {
-		const coverImage = req.files?.coverImage as formidable.File;
+  try {
+    const coverImage = req.files?.coverImage as formidable.File;
 
-		const user = await User.findOne({ _id: req.user._id }).exec();
+    const user = await User.findOne({ _id: req.user._id }).exec();
 
-		if (!user)
-			return next(
-				new CustomException(400, "No user found!", {
-					reason: "account not found",
-					alias: "acc_not_found",
-					code: "ACC_ERR_01",
-				})
-			);
+    if (!user)
+      return next(
+        new CustomException(400, "No user found!", {
+          reason: "account not found",
+          alias: "acc_not_found",
+          code: "ACC_ERR_01",
+        })
+      );
 
-		// Upload image to cloudinary
-		const cloudinaryFolder = `${user.email}-${user._id}`;
+    // Upload image to cloudinary
+    const cloudinaryFolder = `${user.email}-${user._id}`;
 
-		if (coverImage) {
-			await cloudinaryUpload(coverImage.filepath, cloudinaryFolder)
-				.then(async (downloadURL) => {
-					await User.updateOne(
-						{ _id: req.user._id },
-						{ $set: { cover_photo: downloadURL } }
-					).exec();
+    if (coverImage) {
+      await cloudinaryUpload(coverImage.filepath, cloudinaryFolder)
+        .then(async (downloadURL) => {
+          await User.updateOne(
+            { _id: req.user._id },
+            { $set: { cover_photo: downloadURL } }
+          ).exec();
 
-					return new CustomResponse(res).success(
-						"Cover photo updated.",
-						{},
-						200,
-						{
-							status: "Success",
-							path: "change cover photo",
-						}
-					);
-				})
-				.catch((error) => {
-					console.error(error);
-					return next(
-						new CustomException(error.status || 400, error)
-					);
-				});
-		} else {
-			return next(new CustomException(400, "No data/image sent."));
-		}
-	} catch (error) {
-		console.log(error);
-		return next(error);
-	}
+          return new CustomResponse(res).success(
+            "Cover photo updated.",
+            {},
+            200,
+            {
+              status: "Success",
+              path: "change cover photo",
+            }
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+          return next(new CustomException(error.status || 400, error));
+        });
+    } else {
+      return next(new CustomException(400, "No data/image sent."));
+    }
+  } catch (error) {
+    console.log(error);
+    return next(error);
+  }
 };
 
 export { updateProfile, changeAvatar, changeCoverImage };

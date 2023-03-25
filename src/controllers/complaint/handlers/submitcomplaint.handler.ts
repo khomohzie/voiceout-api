@@ -1,3 +1,4 @@
+import transporter from "@config/email";
 import { TComplaint } from "@interfaces/complaint.interfaces";
 import cloudinaryUpload from "@utils/cloudinary";
 import CustomException from "@utils/handlers/error.handler";
@@ -149,6 +150,24 @@ const submitComplaint = async (
       .catch((err) =>
         next(new CustomException(500, translateError(err).toString()))
       );
+  }
+
+  const msg = `<p>Hello, ${data.receiver}</p>
+              <p>You just received a complaint from someone (${user.email}) in your institution</p>
+              <p>The subject of their complaint is "${data.subject}".
+              <br>Please login to your dashboard to respond to their complaint.</br>
+              </p>
+              <p>This email is intended for ${data.receiver}. If you are not the one, please ignore and delete.</p>
+  `;
+
+  if (data.receiver) {
+    transporter(data.receiver, "VoiceOut - You just received a complaint", msg)
+      .then((data: any) => {
+        console.log("Complaint email sent", data);
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
   }
 };
 
