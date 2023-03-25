@@ -1,5 +1,5 @@
 const Default = (title: string, content: string, signature?: string) => {
-	return `
+  return `
   <!DOCTYPE html>
       <html
         lang="en"
@@ -65,7 +65,7 @@ const Default = (title: string, content: string, signature?: string) => {
                 "
               >
                 <img
-                  src="https://res.cloudinary.com/shelter-app/image/upload/v1665085521/logo/SRH_png_u8bs28.png"
+                  src="https://res.cloudinary.com/ajo-app/image/upload/v1679760700/m6p3s1wyajogcacocdys.png"
                   alt="Logo"
                   style="
                     max-height: 75%;
@@ -89,7 +89,7 @@ const Default = (title: string, content: string, signature?: string) => {
                 ${content}
                 <div style="margin-top: 1rem">
                   <div style="font-weight: 700">Regards,</div>
-                  <div>${signature ?? "Shelter"}</div>
+                  <div>${signature ?? "VoiceOut"}</div>
                 </div>
               </section>
               <footer
@@ -106,12 +106,12 @@ const Default = (title: string, content: string, signature?: string) => {
               >
                 If you have any questions, please contact us at
                 <a
-                  href="mailto:hello.shelterapp@gmail.com"
+                  href="mailto:techmagnatewebdev@gmail.com"
                   style="font-weight: 700; text-decoration: none; color: #4a4a4a"
-                  >hello.shelterapp@gmail.com</a
+                  >techmagnatewebdev@gmail.com</a
                 >
                 <div style="font-size: 11px">
-                  <span>&copy; Shelter. All rights reserved.</span>
+                  <span>&copy; VoiceOut. All rights reserved.</span>
                 </div>
               </footer>
             </main>
@@ -123,7 +123,7 @@ const Default = (title: string, content: string, signature?: string) => {
 };
 
 const template = {
-	default: Default,
+  default: Default,
 };
 
 export default template;
