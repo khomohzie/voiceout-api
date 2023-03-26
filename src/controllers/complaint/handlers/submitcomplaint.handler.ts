@@ -7,6 +7,7 @@ import match from "@utils/match.util";
 import { NextFunction, Request, Response } from "express";
 import translateError from "helpers/mongo_helper";
 import complaintModel from "models/complaint.model";
+import superadminModel from "models/superadmin.model";
 import User from "models/user.model";
 
 /**
@@ -17,6 +18,10 @@ import User from "models/user.model";
  * @param next
  */
 
+type TComplaintInput = TComplaint & {
+  address_to_superadmin: boolean;
+};
+
 const submitComplaint = async (
   req: Request,
   res: Response,
@@ -24,12 +29,12 @@ const submitComplaint = async (
 ) => {
   const body = req.body.data as string;
 
-  let data: TComplaint;
+  let data: TComplaintInput;
 
   if (body) {
     data = JSON.parse(body);
   } else {
-    data = {} as TComplaint;
+    data = {} as TComplaintInput;
   }
 
   const sender = req.user._id;
@@ -65,6 +70,18 @@ const submitComplaint = async (
         validate
       )
     );
+  }
+
+  // If the student chooses to address the complaint to the super admin of their university
+  // then the data.receiver will be the super admin. We have to get the email address first.
+  if (data.address_to_superadmin === true) {
+    const superAdmin = await superadminModel
+      .findOne({
+        university: user.university,
+      })
+      .exec();
+
+    data.receiver = superAdmin?.email;
   }
 
   let complaint = new complaintModel({

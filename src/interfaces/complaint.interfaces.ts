@@ -7,6 +7,7 @@ export interface TComplaint {
   sender: ObjectId;
   category?: string;
   receiver?: string;
+  reassigned_to?: string;
   priority: string;
   anonymity: boolean;
 }

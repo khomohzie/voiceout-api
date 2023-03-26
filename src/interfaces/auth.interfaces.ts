@@ -23,7 +23,7 @@ export interface IUser extends Document {
   matric?: string;
   age?: number;
   gender?: string;
-  institution?: string;
+  university?: string;
   faculty?: string;
   department?: string;
   level?: number;

@@ -30,7 +30,7 @@ const userModel = new Schema(
       type: String,
       enum: ["male", "female"],
     },
-    institution: {
+    university: {
       type: String,
     },
     faculty: {

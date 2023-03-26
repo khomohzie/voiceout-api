@@ -29,6 +29,9 @@ const complaintModel = new Schema(
     receiver: {
       type: String,
     },
+    reassigned_to: {
+      type: String,
+    },
     priority: {
       type: String,
       default: "medium",
