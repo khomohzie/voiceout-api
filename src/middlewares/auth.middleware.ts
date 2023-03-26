@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 
-import User from "../models/user.model";
+import User, { TUser } from "../models/user.model";
 
 import { decode } from "@utils/auth.util";
 import CustomException from "@utils/handlers/error.handler";
 import redisClient from "@utils/redis.util";
-import superadminModel from "models/superadmin.model";
+import superadminModel, { TSuperAdminModel } from "models/superadmin.model";
 
 /**
  * Basically, this middleware is responsible for giving users access to other endpoints.
@@ -51,19 +51,29 @@ export const requireSignin = async (
         );
       }
 
-      const userExists = await User.findById(data?._id).exec();
+      let userExists: TSuperAdminModel | TUser | null = await User.findById(
+        data?._id
+      ).exec();
 
       if (userExists) {
         req.user = data!;
         next();
       } else {
-        return next(
-          new CustomException(403, "User does not exist! Please signup.", {
-            reason: "account not found",
-            alias: "acc_not_found",
-            code: "ACC_ERR_01",
-          })
-        );
+        // Then check if the user is a super admin
+        userExists = await superadminModel.findById(data?._id).exec();
+
+        if (userExists) {
+          req.user = data!;
+          next();
+        } else {
+          return next(
+            new CustomException(403, "User does not exist! Please signup.", {
+              reason: "account not found",
+              alias: "acc_not_found",
+              code: "ACC_ERR_01",
+            })
+          );
+        }
       }
     } catch (error: any) {
       return next(
@@ -153,18 +163,28 @@ export const isVerified = async (
   next: NextFunction
 ) => {
   try {
-    const user = await User.findOne({
+    let user: TSuperAdminModel | TUser | null = await User.findOne({
       $or: [{ _id: req.user?._id }, { email: req.body?.email }],
     }).exec();
 
     if (!user?.verified) {
-      return next(
-        new CustomException(403, "Verify your email to use this service.", {
-          reason: "verification",
-          alias: "acc_not_verified",
-          code: "ACC_ERR_02",
+      // Then check the admin collection too since they may be a super admin
+      user = await superadminModel
+        .findOne({
+          $or: [{ _id: req.user?._id }, { email: req.body?.email }],
         })
-      );
+        .exec();
+
+      // If the user is not verified at all
+      if (!user?.verified) {
+        return next(
+          new CustomException(403, "Verify your email to use this service.", {
+            reason: "verification",
+            alias: "acc_not_verified",
+            code: "ACC_ERR_02",
+          })
+        );
+      }
     }
 
     next();

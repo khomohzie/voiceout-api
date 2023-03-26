@@ -41,6 +41,13 @@ const complaintModel = new Schema(
       type: Boolean,
       default: false,
     },
+    university: {
+      type: String,
+      required: [
+        true,
+        "You must add the university this complaint is coming from.",
+      ],
+    },
   },
   { timestamps: true }
 );

@@ -3,6 +3,7 @@
 // import Cryptr from "cryptr";
 import redisClient from "@utils/redis.util";
 import moment from "moment";
+import { isValidObjectId, Types } from "mongoose";
 
 // const cryptr = new Cryptr(`${process.env.CRYPTR_CODE}`);
 
@@ -16,56 +17,75 @@ import moment from "moment";
 
 // get total time spent or duration
 export async function convertTotalTime({
-	time,
+  time,
 }: {
-	time: number;
+  time: number;
 }): Promise<string> {
-	const formattedSeconds = moment()
-		.startOf("day")
-		.seconds(time)
-		.format("HH:mm:ss");
+  const formattedSeconds = moment()
+    .startOf("day")
+    .seconds(time)
+    .format("HH:mm:ss");
 
-	return formattedSeconds;
+  return formattedSeconds;
 }
 
 interface IDuration extends moment.Duration {
-	_milliseconds?: any;
+  _milliseconds?: any;
 }
 
 // calculate the daily total time
 export async function calculateDailyTotalTime({
-	lastTotalTime,
-	currentTotalTime,
+  lastTotalTime,
+  currentTotalTime,
 }: {
-	lastTotalTime: string;
-	currentTotalTime: string;
+  lastTotalTime: string;
+  currentTotalTime: string;
 }): Promise<{ unformatted?: string; formatted?: string; error?: undefined }> {
-	if (!lastTotalTime || !currentTotalTime) {
-		console.log("Error calculating the daily total time");
-		return { error: undefined };
-	}
+  if (!lastTotalTime || !currentTotalTime) {
+    console.log("Error calculating the daily total time");
+    return { error: undefined };
+  }
 
-	const durations = [lastTotalTime, currentTotalTime];
+  const durations = [lastTotalTime, currentTotalTime];
 
-	const totalDurations: IDuration = durations
-		.slice(1)
-		.reduce(
-			(prev, cur) => moment.duration(cur).add(prev),
-			moment.duration(durations[0])
-		);
+  const totalDurations: IDuration = durations
+    .slice(1)
+    .reduce(
+      (prev, cur) => moment.duration(cur).add(prev),
+      moment.duration(durations[0])
+    );
 
-	const ms = totalDurations._milliseconds;
+  const ms = totalDurations._milliseconds;
 
-	const ticks = ms / 1000;
+  const ticks = ms / 1000;
 
-	const hh = Math.floor(ticks / 3600);
-	const mm = Math.floor((ticks % 3600) / 60);
-	const ss = ticks % 60;
+  const hh = Math.floor(ticks / 3600);
+  const mm = Math.floor((ticks % 3600) / 60);
+  const ss = ticks % 60;
 
-	const unformattedDailyTotal = `${hh}:${mm}:${ss}`;
-	const dailyTotalTime = `${hh}h:${mm}m:${ss}s`;
+  const unformattedDailyTotal = `${hh}:${mm}:${ss}`;
+  const dailyTotalTime = `${hh}h:${mm}m:${ss}s`;
 
-	return { unformatted: unformattedDailyTotal, formatted: dailyTotalTime };
+  return { unformatted: unformattedDailyTotal, formatted: dailyTotalTime };
+}
+
+/**
+ * This function checks to see if the object id passed in will be accepted by mongoose
+ * especially the `findById` method. If yes, it will return the object id else it will
+ * convert it to a valid object id and return it.
+ */
+export function validateId(
+  id: string | Types.ObjectId
+): string | Types.ObjectId {
+  let validComplaintId: string | Types.ObjectId;
+
+  if (isValidObjectId(id)) {
+    validComplaintId = id;
+  } else {
+    validComplaintId = new Types.ObjectId(id);
+  }
+
+  return validComplaintId;
 }
 
 // //get current timestamp

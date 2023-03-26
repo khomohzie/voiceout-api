@@ -8,6 +8,7 @@ export interface TComplaint {
   category?: string;
   receiver?: string;
   reassigned_to?: string;
+  university: string;
   priority: string;
   anonymity: boolean;
 }

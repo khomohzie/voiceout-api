@@ -5,11 +5,15 @@ import uploader from "@config/uploader";
 const router: Router = express.Router();
 
 //Import Controller
-import { register } from "../controllers/super_admin";
+import {
+  reassignComplaint,
+  register,
+  retrieveAllComplaints,
+} from "../controllers/super_admin";
 
 //Import middleware
 import { logger } from "../middlewares/logger.middleware";
-import { requireSignin, isAdmin } from "../middlewares/auth.middleware";
+import { requireSignin, isSuperAdmin } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validate.middleware";
 
 import { createAdminSchema } from "schema/admin.schema";
@@ -19,6 +23,20 @@ router.post(
   uploader.array("id_photo"),
   validate(createAdminSchema),
   register
+);
+
+router.post(
+  "/superadmin/reassign",
+  requireSignin,
+  isSuperAdmin,
+  reassignComplaint
+);
+
+router.get(
+  "/superadmin/complaints",
+  requireSignin,
+  isSuperAdmin,
+  retrieveAllComplaints
 );
 
 logger({

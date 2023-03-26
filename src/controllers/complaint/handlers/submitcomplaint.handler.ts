@@ -39,9 +39,6 @@ const submitComplaint = async (
 
   const sender = req.user._id;
 
-  const user = await User.findOne({ _id: req.user._id }).exec();
-
-  // Validate fields before attempting insertion.
   if (!sender) {
     return next(
       new CustomException(401, "You must be logged in to submit a complaint.", {
@@ -50,6 +47,8 @@ const submitComplaint = async (
       })
     );
   }
+
+  const user = await User.findOne({ _id: req.user._id }).exec();
 
   if (!user)
     return next(
@@ -60,6 +59,7 @@ const submitComplaint = async (
       })
     );
 
+  // Validate fields before attempting insertion.
   const validate = match.obj(data, ["subject", "details"]);
 
   if (validate !== true) {
@@ -74,7 +74,7 @@ const submitComplaint = async (
 
   // If the student chooses to address the complaint to the super admin of their university
   // then the data.receiver will be the super admin. We have to get the email address first.
-  if (data.address_to_superadmin === true) {
+  if (data.address_to_superadmin == true) {
     const superAdmin = await superadminModel
       .findOne({
         university: user.university,
@@ -92,6 +92,7 @@ const submitComplaint = async (
     receiver: data.receiver,
     priority: data.priority,
     anonymity: data.anonymity,
+    university: user.university,
   });
 
   // Upload image to cloudinary
