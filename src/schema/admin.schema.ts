@@ -42,7 +42,7 @@ export const createAdminSchema = object({
   id_photo_front: any()
     .refine(
       (file) => file !== undefined,
-      "Please upload a back photo of your id card"
+      "Please upload a front photo of your id card"
     )
     .refine((file) => file?.size <= 500000, `Max image size is 5MB.`)
     .refine(

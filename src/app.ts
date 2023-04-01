@@ -11,7 +11,7 @@ const app: Express = express();
 //APP MIDDLE-WARES
 // Middleware
 if (process.env.NODE_ENV === "production") {
-	app.use(helmet());
+  app.use(helmet());
 }
 
 app.use(cookieParser());
@@ -30,59 +30,58 @@ import CustomException from "./utils/handlers/error.handler";
 
 // TOOBUSY
 app.use((req: Request, res: Response, next: NextFunction) => {
-	if (toobusy_js()) {
-		const e: ICustomException = new CustomException(
-			429,
-			"Server is too busy. Please try again later."
-		);
-		return new CustomResponse(res, e).error(e.message, e.status, {});
-	}
-	next();
+  if (toobusy_js()) {
+    const e: ICustomException = new CustomException(
+      429,
+      "Server is too busy. Please try again later."
+    );
+    return new CustomResponse(res, e).error(e.message, e.status, {});
+  }
+  next();
 });
 
 app.use("/api", routes);
 
+// default route
+app.get("/", (req: Request, res: Response) => {
+  return new CustomResponse(res).success(
+    "Welcome to the VoiceOut API. All API routes begin with /api.",
+    {},
+    200
+  );
+});
+
 //  404
 app.get("*", (req: Request, res: Response) => {
-	const e: ICustomException = new CustomException(
-		404,
-		"How did you get here?"
-	);
-	return new CustomResponse(res, e).error(
-		e.message,
-		404,
-		{},
-		{
-			path: req.originalUrl,
-			method: req.method,
-		}
-	);
+  const e: ICustomException = new CustomException(404, "How did you get here?");
+  return new CustomResponse(res, e).error(
+    e.message,
+    404,
+    {},
+    {
+      path: req.originalUrl,
+      method: req.method,
+    }
+  );
 });
 
 // ERROR MIDDLEWARE
 
 app.use(
-	(
-		err: ICustomException,
-		req: Request,
-		res: Response,
-		next: NextFunction
-	) => {
-		if (
-			process.env.NODE_ENV !== "production" ||
-			err.name !== "CustomException"
-		) {
-			console.error(err);
-		}
-		return new CustomResponse(res, err).error(
-			err.name === "CustomException"
-				? err.message
-				: "Something went wrong!",
-			err.name === "CustomException" ? err.status : 500,
-			{},
-			err.name === "CustomException" ? err.meta : {}
-		);
-	}
+  (err: ICustomException, req: Request, res: Response, next: NextFunction) => {
+    if (
+      process.env.NODE_ENV !== "production" ||
+      err.name !== "CustomException"
+    ) {
+      console.error(err);
+    }
+    return new CustomResponse(res, err).error(
+      err.name === "CustomException" ? err.message : "Something went wrong!",
+      err.name === "CustomException" ? err.status : 500,
+      {},
+      err.name === "CustomException" ? err.meta : {}
+    );
+  }
 );
 
 export default app;
