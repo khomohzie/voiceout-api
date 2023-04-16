@@ -4,6 +4,7 @@ import { default as authRoute } from "./auth.route";
 import { default as userRoute } from "./user.route";
 import { default as complaintRoute } from "./complaint.route";
 import { default as superAdminRoute } from "./superadmin.route";
+import { default as adminRoute } from "./admin.route";
 
 const router: Router = require("express").Router();
 
@@ -37,6 +38,14 @@ router.use(
     log: true,
   }),
   superAdminRoute
+);
+
+router.use(
+  "",
+  scrawny({
+    log: true,
+  }),
+  adminRoute
 );
 
 export default router;

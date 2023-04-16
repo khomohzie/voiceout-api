@@ -1,6 +1,13 @@
 import { object, string, TypeOf, any } from "zod";
 
-export const createAdminSchema = object({
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
+export const createSuperAdminSchema = object({
   body: object({
     email: string({ required_error: "Email is required" }).email(
       "Invalid email"
@@ -32,9 +39,29 @@ export const createAdminSchema = object({
     extra_info: string().optional(),
     data: any().optional(),
   }),
+  id_photo_front: any()
+    .refine(
+      (file) => file !== undefined,
+      "Please upload a front photo of your id card"
+    )
+    .refine((file) => file?.size <= 500000, `Max image size is 5MB.`)
+    .refine(
+      (file) => ACCEPTED_IMAGE_TYPES.includes(file?.mimetype),
+      "Only .jpg, .jpeg, .png and .webp formats are supported."
+    ),
+  id_photo_back: any()
+    .refine(
+      (file) => file !== undefined,
+      "Please upload a back photo of your id card"
+    )
+    .refine((file) => file?.size <= 500000, `Max image size is 5MB.`)
+    .refine(
+      (file) => ACCEPTED_IMAGE_TYPES.includes(file?.mimetype),
+      "Only .jpg, .jpeg, .png and .webp formats are supported."
+    ),
 });
 
-export const loginAdminSchema = object({
+export const loginSuperAdminSchema = object({
   body: object({
     email: string({ required_error: "Email is required" }).email(
       "This is not a valid email address"
@@ -43,5 +70,9 @@ export const loginAdminSchema = object({
   }),
 });
 
-export type TCreateAdminInput = TypeOf<typeof createAdminSchema>["body"];
-export type TLoginAdminInput = TypeOf<typeof loginAdminSchema>["body"];
+export type TCreateSuperAdminInput = TypeOf<
+  typeof createSuperAdminSchema
+>["body"];
+export type TLoginSuperAdminInput = TypeOf<
+  typeof loginSuperAdminSchema
+>["body"];

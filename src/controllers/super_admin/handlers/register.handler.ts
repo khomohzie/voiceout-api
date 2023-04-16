@@ -5,7 +5,7 @@ import CustomResponse from "@utils/handlers/response.handler";
 import { NextFunction, Request, Response } from "express";
 import translateError from "helpers/mongo_helper";
 import superadminModel, { TSuperAdminModel } from "models/superadmin.model";
-import { TCreateAdminInput } from "schema/admin.schema";
+import { TCreateSuperAdminInput } from "schema/superadmin.schema";
 
 /**
  * @desc Allows the super admin of an institution to register a new institution.
@@ -17,7 +17,7 @@ import { TCreateAdminInput } from "schema/admin.schema";
  */
 
 const register = async (
-  req: Request<{}, {}, TCreateAdminInput>,
+  req: Request<{}, {}, TCreateSuperAdminInput>,
   res: Response,
   next: NextFunction
 ) => {

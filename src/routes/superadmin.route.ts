@@ -16,12 +16,12 @@ import { logger } from "../middlewares/logger.middleware";
 import { requireSignin, isSuperAdmin } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validate.middleware";
 
-import { createAdminSchema } from "schema/admin.schema";
+import { createSuperAdminSchema } from "schema/superadmin.schema";
 
 router.post(
   "/superadmin/register",
   uploader.array("id_photo"),
-  validate(createAdminSchema),
+  validate(createSuperAdminSchema),
   register
 );
 

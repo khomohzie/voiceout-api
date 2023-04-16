@@ -15,7 +15,8 @@
     "paths": {
       "@config/*": ["config/*"],
       "@utils/*": ["utils/*"],
-      "@interfaces/*": ["interfaces/*"]
+      "@interfaces/*": ["interfaces/*"],
+      "@models/*": ["models/*"]
     }
   }
 }
