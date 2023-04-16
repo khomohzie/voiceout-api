@@ -125,6 +125,7 @@ const submitComplaint = async (
           receiver: data.receiver,
           priority: data.priority,
           anonymity: data.anonymity,
+          university: user.university,
         });
 
         await complaint
