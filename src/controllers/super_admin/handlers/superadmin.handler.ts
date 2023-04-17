@@ -18,19 +18,33 @@ const retrieveAllComplaints = async (
   res: Response,
   next: NextFunction
 ) => {
-  const superAdmin = await superadminModel
-    .findById(validateId(req.user._id))
-    .exec();
+  try {
+    const superAdmin = await superadminModel
+      .findById(validateId(req.user._id))
+      .exec();
 
-  const allComplaints = await complaintModel
-    .find({ university: superAdmin?.university })
-    .exec();
+    const allComplaints = await complaintModel
+      .find({ university: superAdmin?.university })
+      .exec();
 
-  if (allComplaints.length < 1) {
+    if (allComplaints.length < 1) {
+      return next(
+        new CustomResponse(res).success(
+          "No complaints at the moment. keep an eye out though.",
+          {},
+          200,
+          {
+            success: true,
+            path: "/superadmin/complaints",
+          }
+        )
+      );
+    }
+
     return next(
       new CustomResponse(res).success(
-        "No complaints at the moment. keep an eye out though.",
-        {},
+        "Complaints retrieved successfully",
+        allComplaints,
         200,
         {
           success: true,
@@ -38,19 +52,10 @@ const retrieveAllComplaints = async (
         }
       )
     );
+  } catch (error) {
+    console.log(error);
+    return next(error);
   }
-
-  return next(
-    new CustomResponse(res).success(
-      "Complaints retrieved successfully",
-      allComplaints,
-      200,
-      {
-        success: true,
-        path: "/superadmin/complaints",
-      }
-    )
-  );
 };
 
 export { retrieveAllComplaints };

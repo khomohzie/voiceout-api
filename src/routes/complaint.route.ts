@@ -8,6 +8,7 @@ import {
   complaintDetails,
   getMyComplaints,
   submitComplaint,
+  updateComplaintStatus,
 } from "../controllers/complaint";
 
 //Import middleware
@@ -24,6 +25,18 @@ router.post(
 router.get("/complaints/me", requireSignin("user"), getMyComplaints);
 
 router.get("/complaints/:id", complaintDetails);
+
+router.patch(
+  "/complaints/status/:id",
+  requireSignin("admin"),
+  updateComplaintStatus("admin")
+);
+
+router.patch(
+  "/complaints/status/superadmin/:id",
+  requireSignin("superadmin"),
+  updateComplaintStatus("superadmin")
+);
 
 logger({
   allowed: ["status", "host", "method", "protocol", "path"],
