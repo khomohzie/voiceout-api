@@ -1,5 +1,5 @@
 import { Schema, model, InferSchemaType } from "mongoose";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 
 const superAdminModel = new Schema(
   {
@@ -54,40 +54,44 @@ const superAdminModel = new Schema(
       type: Boolean,
       default: false,
     },
+    deleted_at: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
-superAdminModel.pre("save", function (next) {
-  var user = this;
+// superAdminModel.pre("save", function (next) {
+//   var user = this;
 
-  // only hash the password if it has been modified (or is new)
-  if (!user.isModified("password")) return next();
+//   // only hash the password if it has been modified (or is new)
+//   if (!user.isModified("password")) return next();
 
-  // generate a salt
-  bcrypt.genSalt(12, function (err, salt) {
-    if (err) return next(err);
+//   // generate a salt
+//   bcrypt.genSalt(12, function (err, salt) {
+//     if (err) return next(err);
 
-    // hash the password using our new salt
-    bcrypt.hash(user.password, salt, function (err, hash) {
-      if (err) return next(err);
+//     // hash the password using our new salt
+//     bcrypt.hash(user.password, salt, function (err, hash) {
+//       if (err) return next(err);
 
-      // override the cleartext password with the hashed one
-      user.password = hash;
-      next();
-    });
-  });
-});
+//       // override the cleartext password with the hashed one
+//       user.password = hash;
+//       next();
+//     });
+//   });
+// });
 
-superAdminModel.methods.comparePassword = function (
-  candidatePassword: string | Buffer,
-  cb: (arg0: Error | null, arg1?: boolean | undefined) => void
-) {
-  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
-};
+// superAdminModel.methods.comparePassword = function (
+//   candidatePassword: string | Buffer,
+//   cb: (arg0: Error | null, arg1?: boolean | undefined) => void
+// ) {
+//   bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+//     if (err) return cb(err);
+//     cb(null, isMatch);
+//   });
+// };
 
 export type TSuperAdminModel = InferSchemaType<typeof superAdminModel>;
 

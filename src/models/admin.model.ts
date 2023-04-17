@@ -45,6 +45,10 @@ const adminModel = new Schema(
       type: Boolean,
       default: false,
     },
+    deleted_at: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

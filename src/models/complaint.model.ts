@@ -32,6 +32,11 @@ const complaintModel = new Schema(
     reassigned_to: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ["received", "pending", "resolved"],
+      default: "received",
+    },
     priority: {
       type: String,
       default: "medium",

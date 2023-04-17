@@ -1,4 +1,5 @@
 import transporter from "@config/email";
+import { encrypt } from "@utils/auth.util";
 import CustomException from "@utils/handlers/error.handler";
 import CustomResponse from "@utils/handlers/response.handler";
 import { signJwt } from "@utils/jwt.utils";
@@ -44,6 +45,8 @@ const register = async (
       );
     }
 
+    const hashedPassword = await encrypt.password(data.password);
+
     const token = signJwt(
       { email: data.email },
       process.env.JWT_PRIVATE_ACTIVATION,
@@ -70,7 +73,7 @@ const register = async (
       firstname: data.firstname,
       lastname: data.lastname,
       email: data.email,
-      password: data.password,
+      password: hashedPassword,
       university: data.university,
       office: data.office,
       phone_number: data.phone_number,

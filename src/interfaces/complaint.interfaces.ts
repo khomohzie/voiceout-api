@@ -10,5 +10,6 @@ export interface TComplaint {
   reassigned_to?: string;
   university: string;
   priority: string;
+  status: string;
   anonymity: boolean;
 }

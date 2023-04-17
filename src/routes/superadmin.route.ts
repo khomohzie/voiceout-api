@@ -27,14 +27,14 @@ router.post(
 
 router.post(
   "/superadmin/reassign",
-  requireSignin,
+  requireSignin("superadmin"),
   isSuperAdmin,
   reassignComplaint
 );
 
 router.get(
   "/superadmin/complaints",
-  requireSignin,
+  requireSignin("superadmin"),
   isSuperAdmin,
   retrieveAllComplaints
 );

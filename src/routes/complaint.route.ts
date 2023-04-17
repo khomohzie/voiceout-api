@@ -12,7 +12,7 @@ import { requireSignin, isAdmin } from "../middlewares/auth.middleware";
 
 router.post(
   "/complaint",
-  requireSignin,
+  requireSignin("user"),
   uploader.array("attachments"),
   submitComplaint
 );

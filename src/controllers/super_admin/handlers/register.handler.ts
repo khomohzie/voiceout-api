@@ -1,4 +1,5 @@
 import transporter from "@config/email";
+import { encrypt } from "@utils/auth.util";
 import cloudinaryUpload from "@utils/cloudinary";
 import CustomException from "@utils/handlers/error.handler";
 import CustomResponse from "@utils/handlers/response.handler";
@@ -44,6 +45,8 @@ const register = async (
     );
   }
 
+  const hashedPassword = await encrypt.password(data.password);
+
   // Upload image to cloudinary
   const cloudinaryFolder = `${data.email}`;
 
@@ -76,7 +79,7 @@ const register = async (
     firstname: data.firstname,
     lastname: data.lastname,
     email: data.email,
-    password: data.password,
+    password: hashedPassword,
     id_photo_front: data.id_photo_front,
     id_photo_back: data.id_photo_back,
     university: data.university,
