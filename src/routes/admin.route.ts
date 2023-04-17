@@ -4,13 +4,14 @@ import express, { Router } from "express";
 const router: Router = express.Router();
 
 //Import Controller
-import { register, verifyEmail } from "../controllers/admin";
+import { adminList, register, verifyEmail } from "../controllers/admin";
 
 //Import middleware
 import { logger } from "../middlewares/logger.middleware";
 import { validate } from "../middlewares/validate.middleware";
 
 import { createAdminSchema } from "schema/admin.schema";
+import { requireSignin } from "middlewares/auth.middleware";
 
 router.post(
   "/admin/register",
@@ -20,6 +21,8 @@ router.post(
 );
 
 router.put("/admin/auth/verify", verifyEmail);
+
+router.get("/admin/list", requireSignin("user"), adminList);
 
 logger({
   allowed: ["status", "host", "method", "protocol", "path"],
