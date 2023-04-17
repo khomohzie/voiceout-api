@@ -4,11 +4,15 @@ import uploader from "@config/uploader";
 const router: Router = express.Router();
 
 //Import Controller
-import { submitComplaint } from "../controllers/complaint";
+import {
+  complaintDetails,
+  getMyComplaints,
+  submitComplaint,
+} from "../controllers/complaint";
 
 //Import middleware
 import { logger } from "../middlewares/logger.middleware";
-import { requireSignin, isAdmin } from "../middlewares/auth.middleware";
+import { requireSignin } from "../middlewares/auth.middleware";
 
 router.post(
   "/complaint",
@@ -16,6 +20,10 @@ router.post(
   uploader.array("attachments"),
   submitComplaint
 );
+
+router.get("/complaints/me", requireSignin("user"), getMyComplaints);
+
+router.get("/complaints/:id", complaintDetails);
 
 logger({
   allowed: ["status", "host", "method", "protocol", "path"],
