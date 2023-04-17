@@ -4,7 +4,12 @@ import express, { Router } from "express";
 const router: Router = express.Router();
 
 //Import Controller
-import { adminList, register, verifyEmail } from "../controllers/admin";
+import {
+  adminList,
+  getAssignedComplaints,
+  register,
+  verifyEmail,
+} from "../controllers/admin";
 
 //Import middleware
 import { logger } from "../middlewares/logger.middleware";
@@ -22,7 +27,15 @@ router.post(
 
 router.put("/admin/auth/verify", verifyEmail);
 
-router.get("/admin/list", requireSignin("user"), adminList);
+router.get("/admin/list", requireSignin("user"), adminList("user"));
+
+router.get(
+  "/admin/list/superadmin",
+  requireSignin("superadmin"),
+  adminList("superadmin")
+);
+
+router.get("/admin/complaints", requireSignin("admin"), getAssignedComplaints);
 
 logger({
   allowed: ["status", "host", "method", "protocol", "path"],

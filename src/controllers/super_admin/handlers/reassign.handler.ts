@@ -1,10 +1,10 @@
 import transporter from "@config/email";
+import adminModel from "@models/admin.model";
 import CustomException from "@utils/handlers/error.handler";
 import CustomResponse from "@utils/handlers/response.handler";
 import { Request, Response, NextFunction } from "express";
 import translateError from "helpers/mongo_helper";
 import complaintModel from "models/complaint.model";
-import userModel from "models/user.model";
 import { isValidObjectId, Types } from "mongoose";
 
 /**
@@ -63,9 +63,7 @@ const reassignComplaint = async (
     );
   }
 
-  const admin = await userModel
-    .findOne({ email: recipient, role: { type: "admin", id: 0 } })
-    .exec();
+  const admin = await adminModel.findOne({ email: recipient }).exec();
 
   if (!admin) {
     return next(
