@@ -25,6 +25,7 @@ const retrieveAllComplaints = async (
 
     const allComplaints = await complaintModel
       .find({ university: superAdmin?.university })
+      .populate({ path: "sender", select: "firstname lastname email" })
       .exec();
 
     if (allComplaints.length < 1) {

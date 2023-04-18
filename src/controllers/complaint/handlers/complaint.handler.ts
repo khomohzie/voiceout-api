@@ -51,6 +51,47 @@ const complaintDetails = async (
   }
 };
 
+const complaintDetailsAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const complaint = await complaintModel
+      .findOne({ _id: req.params.id })
+      .populate({ path: "sender", select: "firstname lastname email" })
+      .exec();
+
+    if (!complaint) {
+      return next(
+        new CustomException(
+          400,
+          "Complaint does not exist or has been deleted.",
+          {
+            success: false,
+            path: "complaint details /api/complaints/:id",
+          }
+        )
+      );
+    }
+
+    return next(
+      new CustomResponse(res).success(
+        "Complaint details retrieved successfully",
+        complaint,
+        200,
+        {
+          status: "success",
+          path: "complaint details /api/complaints/:id",
+        }
+      )
+    );
+  } catch (error) {
+    console.log(error);
+    return next(error);
+  }
+};
+
 /**
  * @desc Users get the history of complaints they submitted.
  * @api {GET} /api/complaints/me
@@ -100,4 +141,4 @@ const getMyComplaints = async (
   }
 };
 
-export { complaintDetails, getMyComplaints };
+export { complaintDetails, getMyComplaints, complaintDetailsAdmin };

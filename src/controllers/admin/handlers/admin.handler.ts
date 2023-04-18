@@ -129,6 +129,7 @@ const getAssignedComplaints = async (
       .find({
         $or: [{ reassigned_to: admin.email }, { receiver: admin.email }],
       })
+      .populate({ path: "sender", select: "firstname lastname email" })
       .exec();
 
     if (!complaints || complaints.length <= 0) {

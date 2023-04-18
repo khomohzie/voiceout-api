@@ -35,6 +35,8 @@ router.post(
 );
 
 router.post("/auth/logout", requireSignin("user"), logout);
+router.post("/auth/logout/admin", requireSignin("admin"), logout);
+router.post("/auth/logout/superadmin", requireSignin("superadmin"), logout);
 
 router.post("/auth/forgot", forgot);
 router.put("/auth/reset", reset);

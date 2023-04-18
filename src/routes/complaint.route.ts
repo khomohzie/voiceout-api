@@ -6,6 +6,7 @@ const router: Router = express.Router();
 //Import Controller
 import {
   complaintDetails,
+  complaintDetailsAdmin,
   getMyComplaints,
   submitComplaint,
   updateComplaintStatus,
@@ -25,6 +26,7 @@ router.post(
 router.get("/complaints/me", requireSignin("user"), getMyComplaints);
 
 router.get("/complaints/:id", complaintDetails);
+router.get("/complaints/admin/:id", complaintDetailsAdmin);
 
 router.patch(
   "/complaints/status/:id",
